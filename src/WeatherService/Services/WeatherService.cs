@@ -38,7 +38,7 @@ namespace WeatherService
             var dtos = Enumerable.Range(1, 5).Select(index => new WeatherDto
             {
                 TemperatureC = rng.Next(-20, 55),
-                Summary = GetSummaryAsync(tracer).Result // for demo only /*Summaries[rng.Next(Summaries.Length)]*/
+                Summary = GetSummaryAsync(tracer, incomingSpan).Result // for demo only
             });
 
             var result = new GetWeathersReply();
@@ -49,7 +49,7 @@ namespace WeatherService
             return Task.FromResult(result);
         }
 
-        private async Task<string> GetSummaryAsync(ITracer tracer)
+        private async Task<string> GetSummaryAsync(ITracer tracer, ISpan span)
         {
             var client = _clientFactory.CreateClient();
 
@@ -57,21 +57,25 @@ namespace WeatherService
 
             var outgoingRequest = new HttpRequestMessage(HttpMethod.Get, clientUrl);
 
-            var outgoingSpan = tracer.StartSpan($"HTTP GET Start to call {clientUrl} to get summary", SpanKind.Client);
-
-            if (outgoingSpan.Context.IsValid)
+            using (tracer.WithSpan(span))
             {
-                tracer.TextFormat.Inject(
-                    outgoingSpan.Context,
-                    outgoingRequest.Headers,
-                    (headers, name, value) => headers.Add(name, value));
+                var outgoingSpan = tracer.StartSpan($"HTTP GET Start to call {clientUrl} to get summary", SpanKind.Client);
+
+                if (outgoingSpan.Context.IsValid)
+                {
+                    tracer.TextFormat.Inject(
+                        outgoingSpan.Context,
+                        outgoingRequest.Headers,
+                        (headers, name, value) => headers.Add(name, value));
+                }
+
+                var result = await client.SendAsync(outgoingRequest);
+
+                outgoingSpan.End();
+
+
+                return await result.Content.ReadAsStringAsync();
             }
-
-            var result = await client.SendAsync(outgoingRequest);
-
-            outgoingSpan.End();
-
-            return await result.Content.ReadAsStringAsync();
         }
     }
 }

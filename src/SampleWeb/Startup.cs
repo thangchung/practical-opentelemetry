@@ -4,6 +4,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Exporter.Jaeger;
+using OpenTelemetry.Trace.Configuration;
+using OpenTelemetry.Trace.Export;
+using OpenTelemetry.Trace.Sampler;
+using Shared;
 
 namespace SampleWeb
 {
@@ -20,7 +24,17 @@ namespace SampleWeb
         {
             services.AddControllers();
 
-            services.AddOpenTelemetry();
+            services.AddOpenTelemetry(builder =>
+            {
+                builder.SetSampler(Samplers.AlwaysSample);
+
+                builder.AddRequestCollector()
+                    .AddDependencyCollector();
+
+                builder.AddProcessorPipeline(c => c
+                    .SetExporter(new JaegerTraceExporter(Configuration.GetOptions<JaegerExporterOptions>("Jaeger")))
+                    .SetExportingProcessor(e => new BatchingSpanProcessor(e)));
+            });
 
             services.AddHttpClient();
         }

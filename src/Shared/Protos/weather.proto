@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option csharp_namespace = "Shared";
+
+package weather;
+
+service Weather {
+  rpc GetWeathers (GetWeathersRequest) returns (GetWeathersReply);
+}
+
+message GetWeathersRequest {
+}
+
+message GetWeathersReply {
+  repeated WeatherDto items = 1;
+}
+
+message WeatherDto {
+  int32 temperature_c = 1;
+  int32 temperature_f = 2;
+  string summary = 3;
+}

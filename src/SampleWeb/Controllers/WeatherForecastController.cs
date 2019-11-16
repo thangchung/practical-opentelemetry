@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Grpc.Core;
+using Grpc.Net.Client;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using OpenTelemetry.Exporter.Jaeger;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Trace.Configuration;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,33 +19,25 @@ namespace SampleWeb.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
         private readonly ILogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(IHttpClientFactory clientFactory, ILogger<WeatherForecastController> logger)
+        private JaegerExporterOptions jaegerOptions = null; 
+
+        public WeatherForecastController(IHttpClientFactory clientFactory, IConfiguration config, ILogger<WeatherForecastController> logger)
         {
             ClientFactory = clientFactory;
+            jaegerOptions = config.GetOptions<JaegerExporterOptions>("Jaeger");
             _logger = logger;
         }
 
         public IHttpClientFactory ClientFactory { get; }
+        public TracerFactory TracerFac => jaegerOptions.GetTracerFactory();
+        public IConfiguration Configuration { get; }
 
         [HttpGet]
         public async Task<IEnumerable<WeatherForecast>> Get()
         {
-            var jaegerOptions = new JaegerExporterOptions()
-            {
-                ServiceName = "sample-web",
-                AgentHost = "localhost",
-                AgentPort = 6831,
-            };
-
-            using var tracerFactory = TracerFactory.Create(builder => builder
-                .AddProcessorPipeline(c => c
-                    .SetExporter(new JaegerTraceExporter(jaegerOptions))));
+            using var tracerFactory = TracerFac;
 
             var tracer = tracerFactory.GetTracer("sample-web-tracer");
 
@@ -50,50 +45,36 @@ namespace SampleWeb.Controllers
             {
                 var rng = new Random();
 
-                var products = await DoSomething(tracer);
+                var weatherData = await GetWeatherData(tracer);
 
-                return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+                return weatherData.Select(prod => new WeatherForecast
                 {
-                    
-                    Date = DateTime.Now.AddDays(index),
-                    TemperatureC = rng.Next(-20, 55),
-                    Summary = Summaries[rng.Next(Summaries.Length)]
+                    Date = DateTime.Now.AddDays(rng.Next(1, 10)),
+                    TemperatureC = prod.TemperatureC,
+                    Summary = prod.Summary
                 })
                 .ToArray();
             }
         }
 
-        private async Task<List<Product>> DoSomething(ITracer tracer)
+        private async Task<List<WeatherDto>> GetWeatherData(ITracer tracer)
         {
-            var client = ClientFactory.CreateClient();
-            var clientUrl = "http://localhost:5001/products";
+            var clientUrl = "https://localhost:5002";
+            var channel = GrpcChannel.ForAddress(clientUrl);
+            var client = new Weather.WeatherClient(channel);
+            
+            var headers = new Metadata();
 
-            var outgoingRequest = new HttpRequestMessage(HttpMethod.Get, clientUrl);
-
-            var outgoingSpan = tracer.StartSpan($"Start to call {clientUrl} to get products", SpanKind.Client);
+            var outgoingSpan = tracer.StartSpan($"Start to call {clientUrl} to get weather data", SpanKind.Client);
 
             if (outgoingSpan.Context.IsValid)
-            {
-                tracer.TextFormat.Inject(
-                    outgoingSpan.Context,
-                    outgoingRequest.Headers,
-                    (headers, name, value) => headers.Add(name, value));
-            }
+                tracer.TextFormat.Inject(outgoingSpan.Context, headers, (headers, name, value) => headers.Add(name, value));
 
-            var jsonData = await client.SendAsync(outgoingRequest);
+            var result = await client.GetWeathersAsync(new GetWeathersRequest(), headers);
 
             outgoingSpan.End();
 
-            var products = JsonConvert.DeserializeObject<List<Product>>(await jsonData.Content.ReadAsStringAsync());
-
-            return products;
+            return result.Items.ToList();
         }
-    }
-
-    public class Product
-    {
-        public Guid Id { get; set; }
-
-        public string Name { get; set; }
     }
 }

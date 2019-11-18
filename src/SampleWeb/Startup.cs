@@ -28,12 +28,15 @@ namespace SampleWeb
             {
                 builder.SetSampler(Samplers.AlwaysSample);
 
-                builder.AddRequestCollector()
-                    .AddDependencyCollector();
-
                 builder.AddProcessorPipeline(c => c
                     .SetExporter(new JaegerTraceExporter(Configuration.GetOptions<JaegerExporterOptions>("Jaeger")))
                     .SetExportingProcessor(e => new BatchingSpanProcessor(e)));
+
+                builder
+                    .UseZipkin(o => Configuration.Bind("Zipkin", o));
+
+                builder.AddRequestCollector()
+                    .AddDependencyCollector();
             });
 
             services.AddHttpClient();

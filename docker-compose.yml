@@ -17,6 +17,15 @@ services:
     networks:
       - coolstore
 
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
+    restart: always
+    ports:
+      - 9412:9411
+    networks:
+      - coolstore
+
   seq:
     image: datalust/seq
     container_name: seq

@@ -8,17 +8,41 @@ using Newtonsoft.Json;
 using OpenTelemetry.Exporter.Jaeger;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Trace.Configuration;
+using OpenTelemetry.Trace.Export;
+using OpenTelemetry.Trace.Sampler;
+using Shared;
 using System;
 using System.Collections.Generic;
-using Shared;
 
 namespace ProductService
 {
     public class Startup
     {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddOpenTelemetry();
+            services.AddOpenTelemetry(builder =>
+            {
+                builder.SetSampler(Samplers.AlwaysSample);
+
+                builder.AddProcessorPipeline(c => c
+                    .SetExporter(new JaegerTraceExporter(Configuration.GetOptions<JaegerExporterOptions>("Jaeger")))
+                    .SetExportingProcessor(e => new BatchingSpanProcessor(e)));
+
+                builder
+                    .UseZipkin(o => Configuration.Bind("Zipkin", o));
+
+                builder.AddRequestCollector()
+                    .AddDependencyCollector();
+            });
+
+            services.AddScoped(resolver => resolver.GetService<TracerFactory>().GetTracer("product-service-tracer"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

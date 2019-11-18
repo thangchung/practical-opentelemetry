@@ -20,28 +20,25 @@ namespace SampleWeb.Controllers
         public ValuesController(IHttpClientFactory clientFactory, TracerFactory tracerFactory, ILogger<WeatherForecastController> logger)
         {
             ClientFactory = clientFactory;
-            Tracer = tracerFactory.GetTracer("values-controller-tracer");
+            TracerFactory = tracerFactory;
             _logger = logger;
         }
 
         public IHttpClientFactory ClientFactory { get; }
-        public ITracer Tracer { get; }
+        public TracerFactory TracerFactory { get; }
 
         [HttpGet]
         public async Task<IEnumerable<string>> Get()
         {
-            //using (TracerFac)
+            var tracer = this.TracerFactory.GetTracer("values-ctl-tracer");
+
+            using (tracer.StartActiveSpan("HTTP GET value -> products", out var span))
             {
-                //var tracer = TracerFac.GetTracer("values-controller-tracer");
-
-                using (Tracer.StartActiveSpan("values-get", out var span))
-                {
-                    var products = await DoSomething(Tracer);
-                    span.End();
-                }
-
-                return Enumerable.Range(1, 5).Select(index => index.ToString()).ToArray();
+                var products = await DoSomething(tracer);
+                span.End();
             }
+
+            return Enumerable.Range(1, 5).Select(index => index.ToString()).ToArray();
         }
 
         private async Task<List<Product>> DoSomething(ITracer tracer)

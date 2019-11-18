@@ -30,7 +30,15 @@ REST -> gRPC -> REST
 
 [http://localhost:16686](http://localhost:16686/)
 
-![](assets/tracing01.png)
+![](assets/tracing01_jaeger.png)
+
+## Zipkin UI
+
+REST -> gRPC -> REST
+
+[http://localhost:9412](http://localhost:9412/)
+
+![](assets/tracing02_zipkin.png)
 
 ## Seq UI
 

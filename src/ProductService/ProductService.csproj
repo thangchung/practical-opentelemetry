@@ -11,6 +11,7 @@
     <PackageReference Include="OpenTelemetry.Collector.Dependencies" Version="0.2.0-alpha.110" />
     <PackageReference Include="OpenTelemetry.Hosting" Version="0.2.0-alpha.110" />
     <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="0.2.0-alpha.110" />
+    <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="0.2.0-alpha.110" />
     <PackageReference Include="Serilog" Version="2.9.0" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />

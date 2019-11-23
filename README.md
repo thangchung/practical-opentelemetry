@@ -6,9 +6,10 @@ This is a demo to show how to use OpenTelemetry for tracing on multiple services
 
 # Demo scenario
 
-1. SampleWeb (REST)
-2. WeatherService (gRPC)
-3. ProductService (REST)
+1. SampleWeb (REST) - http://localhost:5000
+2. WeatherService (gRPC) - http://localhost:5002
+3. ProductService (REST) - http://localhost:5001
+4. MeteoriteService (gRPC) - http://localhost:5003
 
 ### Step 1:
 
@@ -40,6 +41,9 @@ REST -> gRPC -> REST
 
 ![](assets/tracing02_zipkin.png)
 
+Trace from SampleWeb to MeteoriteService and to Remote URL at https://data.nasa.gov/resource/y77d-th95.json
+
+![](assets/tracing03_zipkin.png)
 
 ## Loki - Grafana
 

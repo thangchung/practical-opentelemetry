@@ -1,0 +1,36 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Shared";
+
+import "google/protobuf/timestamp.proto";
+
+package meteorite;
+
+service Meteorite {
+  rpc GetMeteoriteLandings(EmptyRequest) returns (MeteoriteLandingsReply) {};
+}
+
+message EmptyRequest {
+}
+
+message MeteoriteLandingsReply {
+  repeated MeteoriteLanding MeteoriteLandings = 1;
+}
+
+message MeteoriteLanding {
+  uint32 id = 1;
+  string name = 2;
+  string fall = 3;
+  GeoLocation geolocation = 4;
+  double mass = 5;
+  string nametype = 6;
+  string recclass = 7;
+  double reclat = 8;
+  double reclong = 9;
+  //google.protobuf.Timestamp year = 10;
+}
+
+message GeoLocation {
+  string type = 1;
+  repeated double coordinates = 2;
+}

@@ -30,7 +30,7 @@ namespace SampleWeb.Controllers
         [HttpGet]
         public async Task<IEnumerable<string>> Get()
         {
-            var tracer = this.TracerFactory.GetTracer("values-ctl-tracer");
+            var tracer = TracerFactory.GetTracer("values-ctl-tracer");
 
             using (tracer.StartActiveSpan("HTTP GET value -> products", out var span))
             {

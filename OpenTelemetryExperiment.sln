@@ -7,14 +7,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleWeb", "src\SampleWeb\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4F567958-C1B0-45BB-BEB6-294E8426C468}"
 	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
 		Nuget.config = Nuget.config
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductService", "src\ProductService\ProductService.csproj", "{783AFA1B-1E0E-4E6A-9D9E-9F1B6752B90F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "src\Shared\Shared.csproj", "{52483752-5EF7-473C-B899-02BC1C00D100}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "src\Shared\Shared.csproj", "{52483752-5EF7-473C-B899-02BC1C00D100}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherService", "src\WeatherService\WeatherService.csproj", "{52F33149-6988-4753-ABE6-ECB16C12691F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeatherService", "src\WeatherService\WeatherService.csproj", "{52F33149-6988-4753-ABE6-ECB16C12691F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

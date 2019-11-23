@@ -4,11 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OpenTelemetry.Exporter.Jaeger;
 using OpenTelemetry.Trace.Configuration;
-using OpenTelemetry.Trace.Export;
 using OpenTelemetry.Trace.Sampler;
-using Shared;
 
 namespace WeatherService
 {
@@ -29,9 +26,7 @@ namespace WeatherService
             {
                 builder.SetSampler(Samplers.AlwaysSample);
 
-                builder.AddProcessorPipeline(c => c
-                    .SetExporter(new JaegerTraceExporter(Configuration.GetOptions<JaegerExporterOptions>("Jaeger")))
-                    .SetExportingProcessor(e => new BatchingSpanProcessor(e)));
+                builder.UseJaeger(o => Configuration.Bind("Jaeger", o));
 
                 builder
                     .UseZipkin(o => Configuration.Bind("Zipkin", o));

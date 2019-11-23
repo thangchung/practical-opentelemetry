@@ -38,6 +38,46 @@ services:
     networks:
       - coolstore
 
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - 3100:3100
+    volumes:
+      - ./config/loki-config.yaml:/etc/loki/loki-config.yaml
+    command: -config.file=/etc/loki/loki-config.yaml
+    depends_on:
+      - promtail
+    networks:
+      - coolstore
+
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - ./config/promtail.yml:/etc/promtail/docker-config.yaml
+    command: -config.file=/etc/promtail/docker-config.yaml
+    networks:
+      - coolstore
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource,grafana-piechart-panel
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana:/var/lib/grafana
+    depends_on:
+      - loki
+    networks:
+      - coolstore
+
+volumes:
+  grafana:
+  prometheus:
+  promtail:
+
 networks:
   coolstore:
     name: coolstore-network

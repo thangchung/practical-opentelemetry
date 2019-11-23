@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 using OpenTelemetry.Exporter.Jaeger;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Trace.Configuration;
-using OpenTelemetry.Trace.Export;
 using OpenTelemetry.Trace.Sampler;
 using Shared;
 using System;
@@ -31,9 +30,7 @@ namespace ProductService
             {
                 builder.SetSampler(Samplers.AlwaysSample);
 
-                builder.AddProcessorPipeline(c => c
-                    .SetExporter(new JaegerTraceExporter(Configuration.GetOptions<JaegerExporterOptions>("Jaeger")))
-                    .SetExportingProcessor(e => new BatchingSpanProcessor(e)));
+                builder.UseJaeger(o => Configuration.Bind("Jaeger", o));
 
                 builder
                     .UseZipkin(o => Configuration.Bind("Zipkin", o));
@@ -58,16 +55,9 @@ namespace ProductService
             {
                 endpoints.MapGet("/products", async httpContext =>
                 {
-                    var jaegerOptions = new JaegerExporterOptions()
-                    {
-                        ServiceName = "product-service",
-                        AgentHost = "localhost",
-                        AgentPort = 6831,
-                    };
+                    var jaegerOptions = Configuration.GetOptions<JaegerExporterOptions>("Jaeger");
 
-                    using var tracerFactory = TracerFactory.Create(builder => builder
-                        .AddProcessorPipeline(c => c
-                            .SetExporter(new JaegerTraceExporter(jaegerOptions))));
+                    using var tracerFactory = jaegerOptions.GetTracerFactory();
 
                     var tracer = tracerFactory.GetTracer("product-service-tracer");
 
@@ -92,10 +82,8 @@ namespace ProductService
 
                 endpoints.MapGet("/summary", async httpContext =>
                 {
-                    var config = httpContext.RequestServices.GetService<IConfiguration>();
-
-                    var jaegerOptions = config.GetOptions<JaegerExporterOptions>("Jaeger");
-
+                    var jaegerOptions = Configuration.GetOptions<JaegerExporterOptions>("Jaeger");
+                    
                     using var tracerFactory = jaegerOptions.GetTracerFactory();
 
                     var tracer = tracerFactory.GetTracer("product-service-tracer");

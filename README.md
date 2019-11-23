@@ -40,6 +40,17 @@ REST -> gRPC -> REST
 
 ![](assets/tracing02_zipkin.png)
 
+
+## Loki - Grafana
+
+[http://localhost:3000](http://localhost:3000/)
+
+![](assets/loki-grafana-config.png)
+
+Then type `{app="sample-web", level="information"} \d{1,9}ms` on `Log labels`
+
+![](assets/loki-grafana-logs.png)
+
 ## Seq UI
 
 [http://localhost:5340](http://localhost:5340/)

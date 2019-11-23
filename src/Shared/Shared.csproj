@@ -13,12 +13,13 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.0.0" />
-    <PackageReference Include="OpenTelemetry" Version="0.2.0-alpha.110" />
-    <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="0.2.0-alpha.110" />
+    <PackageReference Include="OpenTelemetry" Version="0.2.0-alpha.120" />
+    <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="0.2.0-alpha.120" />
+    <PackageReference Include="Serilog.Sinks.Loki" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf  Include="Protos\weather.proto" GrpcServices="Both" />
+    <Protobuf Include="Protos\weather.proto" GrpcServices="Both" />
   </ItemGroup>
 
 </Project>

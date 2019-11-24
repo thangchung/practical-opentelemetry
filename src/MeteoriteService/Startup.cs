@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Collector.StackExchangeRedis;
 using OpenTelemetry.Trace.Configuration;
 using OpenTelemetry.Trace.Sampler;
+using Shared.Kafka;
 using Shared.Redis;
 
 namespace MeteoriteService
@@ -21,9 +23,14 @@ namespace MeteoriteService
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<RedisOptions>(o => Configuration.Bind("Redis", o));
+            services.AddSingleton<RedisStore>();
+
+            services.AddSingleton<MessageBus>();
+
             services.AddGrpc();
 
-            services.AddOpenTelemetry(builder =>
+            services.AddOpenTelemetry((resolver, builder) =>
             {
                 builder.SetSampler(Samplers.AlwaysSample);
 
@@ -32,12 +39,19 @@ namespace MeteoriteService
                 builder
                     .UseZipkin(o => Configuration.Bind("Zipkin", o));
 
-                builder.AddRequestCollector()
+                builder
+                    .AddCollector(c =>
+                    {
+                        using var scope = resolver.CreateScope();
+                        var provider = scope.ServiceProvider;
+                        var connection = provider.GetService<RedisStore>()?.Connection;
+                        var collector = new StackExchangeRedisCallsCollector(c);
+                        connection.RegisterProfiler(collector.GetProfilerSessionsFactory());
+                        return collector;
+                    })
+                    .AddRequestCollector()
                     .AddDependencyCollector();
             });
-
-            services.Configure<RedisOptions>(o => Configuration.Bind("Redis", o));
-            services.AddScoped<RedisStore>();
 
             services.AddHttpClient();
         }

@@ -3,8 +3,15 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Trace;
 using OpenTelemetry.Trace.Configuration;
 using OpenTelemetry.Trace.Sampler;
+using Shared;
+using Shared.Kafka;
+using System;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace SampleWeb
 {
@@ -35,6 +42,14 @@ namespace SampleWeb
             });
 
             services.AddHttpClient();
+
+            services
+                .AddGrpcClient<Meteorite.MeteoriteClient>(o =>
+                {
+                    o.Address = new Uri(Configuration.GetValue<string>("GrpcServices:MeteoriteConnection"));
+                });
+
+            services.AddSingleton<MessageBus>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -52,6 +67,47 @@ namespace SampleWeb
             {
                 endpoints.MapControllers();
             });
+
+            Task.Run(() => app.ApplicationServices.GetService<MessageBus>()
+                .SubscribeAsync<MeteoriteLandingsReply>(message =>
+                {
+                    using var scope = app.ApplicationServices.CreateScope();
+                    var resolver = scope.ServiceProvider;
+                    var traceFactory = resolver.GetService<TracerFactory>();
+                    var tracer = traceFactory.GetTracer("kafka-subscriber-tracer");
+                    var traceContext = tracer.TextFormat.Extract(message.Headers, (headers, name) => headers.Select(x => x
+                        .Key == name ? Encoding.ASCII.GetString(x.GetValueBytes()) : "").ToList());
+                    var incomingSpan = tracer.StartSpan("Kafka-subscriber: Received data", traceContext, SpanKind.Server);
+
+                    try
+                    {
+                        // processing message
+                        var here = message;
+
+                        var rng = new Random();
+                        var seed = rng.Next(1, 3);
+                        if (seed % 2 == 0)
+                        {
+                            throw new Exception("I intent to throw this exception. Yahooo!!!");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // commit span
+                        var errorSpan = tracer.StartSpan("error-span", incomingSpan, SpanKind.Consumer);
+                        errorSpan.AddEvent("Kafka-subscriber-error");
+                        errorSpan.PutHttpStatusCode(500, ex.Message);
+                        errorSpan.End();
+
+                        // swallow the exception =))
+                    }
+                    finally
+                    {
+                        // commit span
+                        incomingSpan.End();
+                    }
+                }, new[] { "coolstore-topic" }, default))
+            ;
         }
     }
 }

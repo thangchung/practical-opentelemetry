@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" Version="1.2.2" />
     <PackageReference Include="Google.Protobuf" Version="3.10.1" />
     <PackageReference Include="Grpc" Version="2.25.0" />
     <PackageReference Include="Grpc.Tools" Version="2.25.0">
@@ -12,6 +13,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.0.1" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.0.0" />
     <PackageReference Include="OpenTelemetry" Version="0.2.0-alpha.120" />
     <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="0.2.0-alpha.120" />

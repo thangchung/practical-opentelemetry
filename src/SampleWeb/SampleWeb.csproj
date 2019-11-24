@@ -5,7 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore.Server.ClientFactory" Version="2.25.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.25.0" />
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.25.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="OpenTelemetry" Version="0.2.0-alpha.120" />
     <PackageReference Include="OpenTelemetry.Collector.AspNetCore" Version="0.2.0-alpha.120" />

@@ -11,6 +11,8 @@ This is a demo to show how to use OpenTelemetry for tracing on multiple services
 3. ProductService (REST) - http://localhost:5001
 4. MeteoriteService (gRPC) - http://localhost:5003
 
+![](assets/high-level-architecture-demo.png)
+
 ### Step 1:
 
 ```
@@ -39,9 +41,13 @@ REST -> gRPC -> REST
 
 [http://localhost:9412](http://localhost:9412/)
 
-![](assets/tracing02_zipkin.png)
+![](assets/tracing01_zipkin.png)
 
 Trace from SampleWeb to MeteoriteService and to Remote URL at https://data.nasa.gov/resource/y77d-th95.json
+
+![](assets/tracing02_zipkin.png)
+
+Trace with error on the consumer side
 
 ![](assets/tracing03_zipkin.png)
 

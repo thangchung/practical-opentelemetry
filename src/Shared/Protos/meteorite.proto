@@ -7,10 +7,12 @@ import "google/protobuf/timestamp.proto";
 package meteorite;
 
 service Meteorite {
-  rpc GetMeteoriteLandings(EmptyRequest) returns (MeteoriteLandingsReply) {};
+  rpc GetMeteoriteLandings(MeteoriteLandingsRequest) returns (MeteoriteLandingsReply) {};
 }
 
-message EmptyRequest {
+message MeteoriteLandingsRequest {
+  int32 skip = 1;
+  int32 take = 2;
 }
 
 message MeteoriteLandingsReply {

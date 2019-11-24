@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29505.145
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleWeb", "src\SampleWeb\SampleWeb.csproj", "{07D7F8CB-302B-49EA-9BBD-DF055E2B4FE8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4F567958-C1B0-45BB-BEB6-294E8426C468}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "__", "__", "{4F567958-C1B0-45BB-BEB6-294E8426C468}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
 		Nuget.config = Nuget.config
@@ -18,6 +18,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeatherService", "src\WeatherService\WeatherService.csproj", "{52F33149-6988-4753-ABE6-ECB16C12691F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeteoriteService", "src\MeteoriteService\MeteoriteService.csproj", "{F2ADF7F6-F26A-4EA8-A731-80048C1516D9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{D1838E32-FBAF-41AD-A848-72F0A41DA3D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +50,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{783AFA1B-1E0E-4E6A-9D9E-9F1B6752B90F} = {D1838E32-FBAF-41AD-A848-72F0A41DA3D7}
+		{52F33149-6988-4753-ABE6-ECB16C12691F} = {D1838E32-FBAF-41AD-A848-72F0A41DA3D7}
+		{F2ADF7F6-F26A-4EA8-A731-80048C1516D9} = {D1838E32-FBAF-41AD-A848-72F0A41DA3D7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {402AB0B0-3D0D-4558-AB27-72588EE5B38B}

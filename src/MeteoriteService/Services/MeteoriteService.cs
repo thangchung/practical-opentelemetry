@@ -1,12 +1,16 @@
+using Confluent.Kafka;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Trace.Configuration;
 using Shared;
+using Shared.Kafka;
 using Shared.Redis;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MeteoriteService
@@ -14,19 +18,22 @@ namespace MeteoriteService
     public class MeteoriteServiceImpl : Meteorite.MeteoriteBase
     {
         private readonly RedisStore _redisStore;
+        private readonly MessageBus _messageBus;
         private readonly IHttpClientFactory _clientFactory;
         private readonly TracerFactory _tracerFactory;
         private readonly ILogger<MeteoriteServiceImpl> _logger;
 
-        public MeteoriteServiceImpl(RedisStore redisStore, IHttpClientFactory clientFactory, TracerFactory tracerFactory, ILogger<MeteoriteServiceImpl> logger)
+        public MeteoriteServiceImpl(RedisStore redisStore, MessageBus messageBus, IHttpClientFactory clientFactory, 
+            TracerFactory tracerFactory, ILogger<MeteoriteServiceImpl> logger)
         {
             _redisStore = redisStore;
+            _messageBus = messageBus;
             _clientFactory = clientFactory;
             _tracerFactory = tracerFactory;
             _logger = logger;
         }
 
-        public override async Task<MeteoriteLandingsReply> GetMeteoriteLandings(EmptyRequest request, ServerCallContext context)
+        public override async Task<MeteoriteLandingsReply> GetMeteoriteLandings(MeteoriteLandingsRequest request, ServerCallContext context)
         {
             var cacheKey = "meteorite-landings";
             var reply = new MeteoriteLandingsReply();
@@ -36,6 +43,7 @@ namespace MeteoriteService
             var httpContext = context.GetHttpContext();
             var traceContext = tracer.TextFormat.Extract(httpContext.Request.Headers, (headers, name) => headers[name]);
             var incomingSpan = tracer.StartSpan("gRPC POST Received data", traceContext, SpanKind.Server);
+            incomingSpan.End();
 
             using (tracer.StartActiveSpan("HTTP GET call to remote site to get data", out var span))
             {
@@ -82,11 +90,24 @@ namespace MeteoriteService
                 }
 
                 var list = JsonConvert.DeserializeObject<List<MeteoriteLanding>>(cacheResult.ToString());
-                reply.MeteoriteLandings.AddRange(list);
+                reply.MeteoriteLandings.AddRange(list.Skip(request.Skip).Take(request.Take));
                 span.End();
             }
 
-            incomingSpan.End();
+            // publish it
+            var messageHeaders = new Headers();
+            var outgoingKafkaSpan = tracer.StartSpan($"Publish message to Kafka.", SpanKind.Producer);
+            if (outgoingKafkaSpan.Context.IsValid)
+            {
+                tracer.TextFormat.Inject(
+                    outgoingKafkaSpan.Context,
+                    messageHeaders,
+                    (headers, name, value) => headers.Add(new Header(name, Encoding.ASCII.GetBytes(value))));
+            }
+
+            await _messageBus.PublishAsync(reply, messageHeaders, new[] { "coolstore-topic" });
+            outgoingKafkaSpan.End();
+
             return reply;
         }
     }

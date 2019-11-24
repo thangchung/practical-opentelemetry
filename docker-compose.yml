@@ -9,14 +9,37 @@ services:
       REDIS_PASSWORD: "P@ssw0rd"
     ports:
       - 6379:6379
-    restart: always
+    restart: on-failure
     networks:
       - coolstore
+
+  zookeeper:
+    image: zookeeper:3.5
+    container_name: zookeeper
+    restart: on-failure
+    ports:
+      - 2181:2181
+
+  kafka:
+    image: wurstmeister/kafka:2.11-2.0.0
+    container_name: kafka
+    restart: on-failure
+    hostname: kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
+      KAFKA_CREATE_TOPICS: "test:1:1"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    ports:
+      - 9092:9092
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
   jaeger:
     image: jaegertracing/all-in-one
     container_name: jaeger
-    restart: always
+    restart: on-failure
     ports:
       - 5775:5775/udp
       - 5778:5778
@@ -31,7 +54,7 @@ services:
   zipkin:
     image: openzipkin/zipkin:latest
     container_name: zipkin
-    restart: always
+    restart: on-failure
     ports:
       - 9412:9411
     networks:
@@ -42,7 +65,7 @@ services:
     container_name: loki
     ports:
       - 3100:3100
-    restart: always
+    restart: on-failure
     volumes:
       - ./config/loki-config.yaml:/etc/loki/loki-config.yaml
     command: -config.file=/etc/loki/loki-config.yaml
@@ -53,7 +76,7 @@ services:
 
   promtail:
     image: grafana/promtail:latest
-    restart: always
+    restart: on-failure
     volumes:
       - ./config/promtail.yml:/etc/promtail/docker-config.yaml
     command: -config.file=/etc/promtail/docker-config.yaml
@@ -67,7 +90,7 @@ services:
       - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource,grafana-piechart-panel
     ports:
       - 3000:3000
-    restart: always
+    restart: on-failure
     volumes:
       - grafana:/var/lib/grafana
     depends_on:
@@ -75,17 +98,17 @@ services:
     networks:
       - coolstore
 
-  seq:
-    image: datalust/seq
-    container_name: seq
-    restart: always
-    environment:
-      - ACCEPT_EULA=Y
-    ports:
-      - 5341:5341
-      - 5340:80
-    networks:
-      - coolstore
+  # seq:
+  #   image: datalust/seq
+  #   container_name: seq
+  #   restart: on-failure
+  #   environment:
+  #     - ACCEPT_EULA=Y
+  #   ports:
+  #     - 5341:5341
+  #     - 5340:80
+  #   networks:
+  #     - coolstore
 
 volumes:
   grafana:

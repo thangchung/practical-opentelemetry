@@ -44,6 +44,7 @@ namespace SampleWeb
 
             services.AddHttpClient();
 
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
             services
                 .AddGrpcClient<Meteorite.MeteoriteClient>(o =>
                 {

@@ -2,17 +2,21 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>dba3b931-8a09-4e01-ab33-0dd84f983e72</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Figgle" Version="0.3.0" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.25.0" />
-    <PackageReference Include="OpenTelemetry" Version="0.2.0-alpha.120" />
-    <PackageReference Include="OpenTelemetry.Collector.AspNetCore" Version="0.2.0-alpha.120" />
-    <PackageReference Include="OpenTelemetry.Collector.Dependencies" Version="0.2.0-alpha.120" />
-    <PackageReference Include="OpenTelemetry.Collector.StackExchangeRedis" Version="0.2.0-alpha.120" />
-    <PackageReference Include="OpenTelemetry.Hosting" Version="0.2.0-alpha.120" />
-    <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="0.2.0-alpha.120" />
-    <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="0.2.0-alpha.120" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.10" />
+    <PackageReference Include="OpenTelemetry" Version="0.2.0-alpha.123" />
+    <PackageReference Include="OpenTelemetry.Collector.AspNetCore" Version="0.2.0-alpha.123" />
+    <PackageReference Include="OpenTelemetry.Collector.Dependencies" Version="0.2.0-alpha.123" />
+    <PackageReference Include="OpenTelemetry.Collector.StackExchangeRedis" Version="0.2.0-alpha.123" />
+    <PackageReference Include="OpenTelemetry.Exporter.Prometheus" Version="0.2.0-alpha.123" />
+    <PackageReference Include="OpenTelemetry.Hosting" Version="0.2.0-alpha.123" />
+    <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="0.2.0-alpha.123" />
+    <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="0.2.0-alpha.123" />
     <PackageReference Include="Serilog" Version="2.9.0" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />

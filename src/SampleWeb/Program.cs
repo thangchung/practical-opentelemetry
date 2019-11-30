@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Sinks.Loki;
 using Shared.Serilog;
+using System;
 
 namespace SampleWeb
 {
@@ -11,6 +12,8 @@ namespace SampleWeb
     {
         public static void Main(string[] args)
         {
+            Console.WriteLine(Figgle.FiggleFonts.Doom.Render($"Web API v0.0.1"));
+
             CreateHostBuilder(args).Build().Run();
         }
 

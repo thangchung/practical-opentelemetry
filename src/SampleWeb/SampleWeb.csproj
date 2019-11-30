@@ -5,16 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Figgle" Version="0.3.0" />
     <PackageReference Include="Grpc.AspNetCore.Server.ClientFactory" Version="2.25.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.25.0" />
     <PackageReference Include="Grpc.Net.ClientFactory" Version="2.25.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="OpenTelemetry" Version="0.2.0-alpha.120" />
-    <PackageReference Include="OpenTelemetry.Collector.AspNetCore" Version="0.2.0-alpha.120" />
-    <PackageReference Include="OpenTelemetry.Collector.Dependencies" Version="0.2.0-alpha.120" />
-    <PackageReference Include="OpenTelemetry.Hosting" Version="0.2.0-alpha.120" />
-    <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="0.2.0-alpha.120" />
-    <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="0.2.0-alpha.120" />
+    <PackageReference Include="OpenTelemetry" Version="0.2.0-alpha.123" />
+    <PackageReference Include="OpenTelemetry.Collector.AspNetCore" Version="0.2.0-alpha.123" />
+    <PackageReference Include="OpenTelemetry.Collector.Dependencies" Version="0.2.0-alpha.123" />
+    <PackageReference Include="OpenTelemetry.Hosting" Version="0.2.0-alpha.123" />
+    <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="0.2.0-alpha.123" />
+    <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="0.2.0-alpha.123" />
     <PackageReference Include="Serilog" Version="2.9.0" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />

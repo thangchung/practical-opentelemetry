@@ -15,8 +15,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.0.1" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.0.0" />
-    <PackageReference Include="OpenTelemetry" Version="0.2.0-alpha.120" />
-    <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="0.2.0-alpha.120" />
+    <PackageReference Include="OpenTelemetry" Version="0.2.0-alpha.123" />
+    <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="0.2.0-alpha.123" />
     <PackageReference Include="Serilog.Sinks.Loki" Version="1.0.1" />
     <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
   </ItemGroup>

@@ -27,6 +27,12 @@ namespace SampleWeb.Controllers
         public IHttpClientFactory ClientFactory { get; }
         public TracerFactory TracerFactory { get; }
 
+        [HttpGet("/")]
+        public string GetHome()
+        {
+            return "OK";
+        }
+
         [HttpGet]
         public async Task<IEnumerable<string>> Get()
         {

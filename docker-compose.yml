@@ -2,6 +2,21 @@ version: "3.7"
 
 services:
 
+  # meteorite-service:
+  #   image: vndg/meteorite-service:${TAG:-latest}
+  #   build:
+  #     context: .
+  #     dockerfile: src/MeteoriteService/Dockerfile
+  #   networks:
+  #     - coolstore
+  #   depends_on:
+  #     - redis
+  #     - kafka
+  #     - jaeger
+  #     - zipkin
+  #     - loki
+  #     - prometheus
+
   redis:
     image: bitnami/redis:5.0.5-debian-9-r124
     container_name: redis
@@ -20,6 +35,8 @@ services:
     restart: on-failure
     ports:
       - 2181:2181
+    networks:
+      - coolstore
 
   kafka:
     image: wurstmeister/kafka:2.11-2.0.0
@@ -36,6 +53,8 @@ services:
       - 9092:9092
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - coolstore
 
   jaeger:
     image: jaegertracing/all-in-one
@@ -96,6 +115,31 @@ services:
       - grafana:/var/lib/grafana
     depends_on:
       - loki
+    networks:
+      - coolstore
+
+  prometheus:
+    image: prom/prometheus:v2.11.1
+    container_name: prometheus
+    volumes:
+      - prometheus:/prometheus
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    restart: on-failure
+    networks:
+      - coolstore
+  
+  cAdvisor:
+    image: google/cadvisor:latest
+    container_name: cAdvisor
+    volumes:
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - 8080:8080
+    restart: on-failure
     networks:
       - coolstore
 

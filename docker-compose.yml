@@ -6,7 +6,8 @@ services:
     image: bitnami/redis:5.0.5-debian-9-r124
     container_name: redis
     environment:
-      REDIS_PASSWORD: "P@ssw0rd"
+      REDIS_PASSWORD: ""
+      ALLOW_EMPTY_PASSWORD: "yes"
     ports:
       - 6379:6379
     restart: on-failure

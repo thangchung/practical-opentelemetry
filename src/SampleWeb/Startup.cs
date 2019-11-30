@@ -8,6 +8,7 @@ using OpenTelemetry.Trace.Configuration;
 using OpenTelemetry.Trace.Sampler;
 using Shared;
 using Shared.Kafka;
+using Shared.Redis;
 using System;
 using System.Linq;
 using System.Text;
@@ -49,6 +50,9 @@ namespace SampleWeb
                     o.Address = new Uri(Configuration.GetValue<string>("GrpcServices:MeteoriteConnection"));
                 });
 
+            services.Configure<RedisOptions>(o => Configuration.Bind("Redis", o));
+            services.AddSingleton<RedisStore>();
+
             services.AddSingleton<MessageBus>();
         }
 
@@ -74,10 +78,12 @@ namespace SampleWeb
                     using var scope = app.ApplicationServices.CreateScope();
                     var resolver = scope.ServiceProvider;
                     var traceFactory = resolver.GetService<TracerFactory>();
+
                     var tracer = traceFactory.GetTracer("kafka-subscriber-tracer");
-                    var traceContext = tracer.TextFormat.Extract(message.Headers, (headers, name) => headers.Select(x => x
-                        .Key == name ? Encoding.ASCII.GetString(x.GetValueBytes()) : "").ToList());
-                    var incomingSpan = tracer.StartSpan("Kafka-subscriber: Received data", traceContext, SpanKind.Server);
+                    var traceContext = tracer.TextFormat.Extract(message.Headers, (headers, name) => headers
+                        .Select(x => x.Key == name ? Encoding.ASCII.GetString(x.GetValueBytes()) : "").ToList());
+
+                    var incomingSpan = tracer.StartSpan("Kafka-subscriber: received data span", traceContext, SpanKind.Server);
 
                     try
                     {

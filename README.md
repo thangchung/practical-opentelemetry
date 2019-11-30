@@ -6,7 +6,7 @@ This is a demo to show how to use OpenTelemetry for tracing on multiple services
 
 # Demo scenario
 
-1. SampleWeb (REST) - http://localhost:5000
+1. Web API (REST) - http://localhost:5000
 2. WeatherService (gRPC) - http://localhost:5002
 3. ProductService (REST) - http://localhost:5001
 4. MeteoriteService (gRPC) - http://localhost:5003
@@ -23,7 +23,7 @@ $ docker-compose up
 
 Then run 3 projects above with Visual Studio or Visual Code
 
-### Step 3: Run `SampleWeb` with url as below
+### Step 3: Run `Web API` with url as below
 
 [http://localhost:<port>/WeatherForecast](http://localhost:<port>/WeatherForecast)
 

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Trace.Configuration;
 using OpenTelemetry.Trace.Sampler;
+using Prometheus;
 using Shared;
 using Shared.Kafka;
 using Shared.Redis;
@@ -64,6 +65,9 @@ namespace SampleWeb
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseMetricServer();
+            app.UseHttpMetrics();
+
             app.UseRouting();
 
             app.UseAuthorization();
@@ -73,10 +77,15 @@ namespace SampleWeb
                 endpoints.MapControllers();
             });
 
-            Task.Run(() => app.ApplicationServices.GetService<MessageBus>()
+            Task.Run(() => ConsumeMessage(app));
+        }
+
+        private Task ConsumeMessage(IApplicationBuilder appBuilder)
+        {
+            return appBuilder.ApplicationServices.GetService<MessageBus>()
                 .SubscribeAsync<MeteoriteLandingsReply>(message =>
                 {
-                    using var scope = app.ApplicationServices.CreateScope();
+                    using var scope = appBuilder.ApplicationServices.CreateScope();
                     var resolver = scope.ServiceProvider;
                     var traceFactory = resolver.GetService<TracerFactory>();
 
@@ -90,18 +99,17 @@ namespace SampleWeb
                     {
                         // processing message
                         var here = message;
-
                         var rng = new Random();
                         var seed = rng.Next(1, 3);
                         if (seed % 2 == 0)
                         {
-                            throw new Exception("I intent to throw this exception. Yahooo!!!");
+                            throw new Exception("I threw this exception intently. Yahooo!!!");
                         }
                     }
                     catch (Exception ex)
                     {
                         // commit span
-                        var errorSpan = tracer.StartSpan("error-span", incomingSpan, SpanKind.Consumer);
+                        var errorSpan = tracer.StartSpan("got error span", incomingSpan, SpanKind.Consumer);
                         errorSpan.AddEvent("Kafka-subscriber-error");
                         errorSpan.PutHttpStatusCode(500, ex.Message);
                         errorSpan.End();
@@ -113,8 +121,7 @@ namespace SampleWeb
                         // commit span
                         incomingSpan.End();
                     }
-                }, new[] { "coolstore-topic" }, default))
-            ;
+                }, new[] { "coolstore-topic" }, default);
         }
     }
 }

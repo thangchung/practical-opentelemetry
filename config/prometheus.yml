@@ -28,13 +28,13 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
     - targets:
-       - 'cAdvisor:8080'
+        - 'cAdvisor:8080'
 
   - job_name: 'meteorite-service'
     scrape_interval: 5s
     static_configs:
     - targets:
-       - 'localhost:15003'
+        - 'meteorite-service:15003'
       labels:
         group: "coolstore"
 
@@ -42,6 +42,6 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
     - targets:
-       - 'localhost:5000'
+        - 'webapi:80'
       labels:
         group: "coolstore"

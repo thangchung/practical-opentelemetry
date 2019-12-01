@@ -2,20 +2,58 @@ version: "3.7"
 
 services:
 
-  # meteorite-service:
-  #   image: vndg/meteorite-service:${TAG:-latest}
-  #   build:
-  #     context: .
-  #     dockerfile: src/MeteoriteService/Dockerfile
-  #   networks:
-  #     - coolstore
-  #   depends_on:
-  #     - redis
-  #     - kafka
-  #     - jaeger
-  #     - zipkin
-  #     - loki
-  #     - prometheus
+  webapi:
+    image: vndg/webapi:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: src/SampleWeb/Dockerfile
+    environment: 
+      Redis__Connection: "redis:6379"
+      Kafka__Connection: "kafka:9092"
+      Jaeger__AgentHost: "jaeger"
+      Zipkin__Endpoint: "http://zipkin:9411/api/v2/spans"
+      Seq__Connection: "http://seq:5341"
+      Loki__Connection: "http://loki:3100"
+      GrpcServices__MeteoriteConnection: "http://meteorite-service:5003"
+    ports:
+      - 5000:80
+    restart: on-failure
+    depends_on:
+      - redis
+      - kafka
+      - zipkin
+      - loki
+      - meteorite-service
+      - prometheus
+      - jaeger
+    networks:
+      - coolstore
+
+  meteorite-service:
+    image: vndg/meteorite-service:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: src/MeteoriteService/Dockerfile
+    environment: 
+      Redis__Connection: "redis:6379"
+      Kafka__Connection: "kafka:9092"
+      Jaeger__AgentHost: "jaeger"
+      Zipkin__Endpoint: "http://zipkin:9411/api/v2/spans"
+      Seq__Connection: "http://seq:5341"
+      Loki__Connection: "http://loki:3100"
+    ports:
+      - 5003:5003
+      - 15003:15003
+    restart: on-failure
+    depends_on:
+      - redis
+      - kafka
+      - zipkin
+      - loki
+      - prometheus
+      - jaeger
+    networks:
+      - coolstore
 
   redis:
     image: bitnami/redis:5.0.5-debian-9-r124
@@ -46,28 +84,14 @@ services:
     depends_on:
       - zookeeper
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
+      KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_CREATE_TOPICS: "test:1:1"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
     ports:
       - 9092:9092
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - coolstore
-
-  jaeger:
-    image: jaegertracing/all-in-one
-    container_name: jaeger
-    restart: on-failure
-    ports:
-      - 5775:5775/udp
-      - 5778:5778
-      - 6831:6831/udp
-      - 6832:6832/udp
-      - 9411:9411
-      - 14268:14268
-      - 16686:16686
     networks:
       - coolstore
 
@@ -94,15 +118,6 @@ services:
     networks:
       - coolstore
 
-  promtail:
-    image: grafana/promtail:latest
-    restart: on-failure
-    volumes:
-      - ./config/promtail.yml:/etc/promtail/docker-config.yaml
-    command: -config.file=/etc/promtail/docker-config.yaml
-    networks:
-      - coolstore
-
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -115,6 +130,15 @@ services:
       - grafana:/var/lib/grafana
     depends_on:
       - loki
+    networks:
+      - coolstore
+
+  promtail:
+    image: grafana/promtail:latest
+    restart: on-failure
+    volumes:
+      - ./config/promtail.yml:/etc/promtail/docker-config.yaml
+    command: -config.file=/etc/promtail/docker-config.yaml
     networks:
       - coolstore
 
@@ -140,6 +164,21 @@ services:
     ports:
       - 8080:8080
     restart: on-failure
+    networks:
+      - coolstore
+
+  jaeger:
+    image: jaegertracing/all-in-one
+    container_name: jaeger
+    restart: on-failure
+    ports:
+      - 5775:5775/udp
+      - 5778:5778
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 9411:9411
+      - 14268:14268
+      - 16686:16686
     networks:
       - coolstore
 

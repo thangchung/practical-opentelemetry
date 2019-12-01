@@ -49,7 +49,7 @@ namespace Shared.Kafka
                 ConstructConfig(_config.GetValue<string>("Kafka:Connection")))
                 .SetValueDeserializer(new ProtoDeserializer<TMessage>())
                 .SetErrorHandler((_, e) => Console.WriteLine($"Error: {e.Reason}"))
-                .SetStatisticsHandler((_, json) => Console.WriteLine($"Statistics: {json}"))
+                //.SetStatisticsHandler((_, json) => Console.WriteLine($"Statistics: {json}"))
                 .Build();
 
             consumer.Subscribe(topics);

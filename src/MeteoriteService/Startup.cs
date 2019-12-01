@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Collector.StackExchangeRedis;
 using OpenTelemetry.Trace.Configuration;
 using OpenTelemetry.Trace.Sampler;
+using Prometheus;
 using Shared.Kafka;
 using Shared.Redis;
 
@@ -23,6 +24,8 @@ namespace MeteoriteService
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers();
+
             services.Configure<RedisOptions>(o => Configuration.Bind("Redis", o));
             services.AddSingleton<RedisStore>();
 
@@ -63,11 +66,16 @@ namespace MeteoriteService
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseMetricServer();
+            app.UseHttpMetrics();
+
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {
                 GrpcEndpointRouteBuilderExtensions.MapGrpcService<MeteoriteServiceImpl>(endpoints);
+
+                endpoints.MapControllers();
 
                 endpoints.MapGet("/", async context =>
                 {

@@ -51,13 +51,21 @@ Trace with error on the consumer side
 
 ![](assets/tracing03_zipkin.png)
 
+## Prometheus - Grafana
+
+Healthcheck with Prometheus
+
+![](assets/prom_01.png)
+
+Monotoring .NET resource with Grafana
+
+![](assets/grafana_01.png)
+
 ## Loki - Grafana
 
 [http://localhost:3000](http://localhost:3000/)
 
-![](assets/loki-grafana-config.png)
-
-Then type `{app="sample-web", level="information"} \d{1,9}ms` on `Log labels`
+Type `{app="sample-web", level="information"} \d{1,9}ms` on `Log labels`
 
 ![](assets/loki-grafana-logs.png)
 

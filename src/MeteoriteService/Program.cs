@@ -18,8 +18,7 @@ namespace MeteoriteService
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine(Figgle.FiggleFonts.Doom.Render($"Meteorite Service v0.0.1"));
-
+            Console.WriteLine(Figgle.FiggleFonts.Standard.Render($"Meteorite Service v0.0.1"));
             CreateHostBuilder(args).Build().Run();
         }
 
@@ -27,21 +26,14 @@ namespace MeteoriteService
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.ConfigureKestrel((ctx, options) =>
-                    {
-                        options.Limits.MinRequestBodyDataRate = null;
-                        options.Listen(IPAddress.Any, 5003, listenOptions =>
-                        {
-                            listenOptions.Protocols = HttpProtocols.Http2;
-                        });
-
-                        var promOptions = new PrometheusExporterOptions() { Url = "http://localhost:15003/metrics/" };
+                    /*var promOptions = new PrometheusExporterOptions() { Url = "http://0.0.0.0:15003/metrics/" };
                         var metric = new Metric<long>("sample");
                         var promExporter = new PrometheusExporter<long>(promOptions, metric);
 
                         try
                         {
                             promExporter.Start();
+                            Log.Logger.Information("Now listening on: http://0.0.0.0:15003");
 
                             var label1 = new List<KeyValuePair<string, string>>();
                             label1.Add(new KeyValuePair<string, string>("status_code", "200"));
@@ -50,8 +42,17 @@ namespace MeteoriteService
                         }
                         catch
                         {
-                            promExporter.Stop();
-                        }
+                            //promExporter.Stop();
+                        }*/
+
+                    webBuilder.ConfigureKestrel((ctx, options) =>
+                    {
+                        options.Limits.MinRequestBodyDataRate = null;
+                        options.Listen(IPAddress.Any, 15003, options => { });
+                        options.Listen(IPAddress.Any, 5003, listenOptions =>
+                        {
+                            listenOptions.Protocols = HttpProtocols.Http2;
+                        });
                     });
 
                     webBuilder.UseStartup<Startup>();

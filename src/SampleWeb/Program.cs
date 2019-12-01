@@ -12,8 +12,7 @@ namespace SampleWeb
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine(Figgle.FiggleFonts.Doom.Render($"Web API v0.0.1"));
-
+            Console.WriteLine(Figgle.FiggleFonts.Standard.Render($"Web API v0.0.1"));
             CreateHostBuilder(args).Build().Run();
         }
 

@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Confluent.Kafka" Version="1.2.2" />
-    <PackageReference Include="Google.Protobuf" Version="3.10.1" />
+    <PackageReference Include="Google.Protobuf" Version="3.15.0" />
     <PackageReference Include="Grpc" Version="2.25.0" />
     <PackageReference Include="Grpc.Tools" Version="2.25.0">
       <PrivateAssets>all</PrivateAssets>
